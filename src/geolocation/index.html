@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>geo</title>
+<style type="text/css">
+html, body{
+  height:100%;
+  margin:0;
+  padding:0;
+  overflow:hidden;
+}
+div#mapBlock{
+  width:100%;
+  height:100%;
+}
+</style>
+</head>
+<body>
+<div id="mapBlock"></div>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+<script type="text/javascript">
+(function($){
+  if(!navigator.geolocation) return false;
+
+  // get current position
+  navigator.geolocation.getCurrentPosition(
+    // success
+    function(p){
+      // 現在地を取得し、LatLng に入れる
+      var latLng = new google.maps.LatLng(p.coords.latitude, p.coords.longitude, true);
+      // marker event click
+      google.maps.event.addListener(new google.maps.Marker({
+        // new map
+        map: new google.maps.Map(document.getElementById("mapBlock"), {
+          zoom      : 18,
+          mapTypeId : google.maps.MapTypeId.ROADMAP,
+          center    : latLng
+        }),
+        // marker.position
+        position : latLng
+      }),
+      'click', function(e){
+        // new infoWindow
+        new google.maps.InfoWindow({
+          content : "<p>" + e.latLng + "</p>"
+        }).open(this.getMap(), this);
+      });
+    },
+
+    // error
+    function(e){
+      $("#mapBlock").append("<dl>");
+      for(var k in e) {
+        $("#mapBlock").append("<dt>" + k + "</dt>");
+        $("#mapBlock").append("<dd>" + e[k] + "</dd>");
+      }
+      $("#mapBlock").append("</dl>");
+      $("#mapBlock").append("<p>エラー</p>");
+    },
+
+    // options
+    function(){}
+  );
+
+  // navigator.geolocation.watchPosition();
+  // navigator.geolocation.clearPosition();
+})(jQuery);
+</script>
+</body>
+</html>

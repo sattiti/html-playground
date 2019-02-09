@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title></title>
+<style type="text/css">
+body{
+  width:100%;
+  height:100%;
+  margin:0;
+  padding:0;
+  position:absolute;
+  left:0;
+  top:0;
+}
+div#wrapper{
+  height:100%;
+  height:100%;
+  overflow:hidden;
+}
+canvas#stage{
+  background-color:#CCC;
+}
+</style>
+</head>
+<body>
+<div id="wrapper">
+  <div id="container">
+    <canvas id="stage"></canvas>
+  </div>
+</div>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
+<script>
+(function($){
+  var DisplayObject = function(){
+    if(typeof(this.init) == 'function'){
+      this.init.apply(this, arguments);
+    };
+  };
+
+  DisplayObject.prototype ={
+    x: 0,
+    y: 0,
+    z: 0,
+    alpha: 1,
+    scaleX: 1,
+    scaleY: 1,
+    scaleZ: 1,
+    width: 0,
+    height: 0,
+    id: '',
+    rotationX: 0,
+    rotationY: 0,
+    rotationZ: 0,
+    visible: true,
+    image: new Image(),
+    init: function(){}
+  };
+
+  // cube
+  var Cube = function(){
+    if(typeof(this.init) == 'function'){
+      this.init.apply(this, arguments);
+    };
+  };
+
+  Cube.prototype = $.extend({}, DisplayObject.prototype, {
+    init : function(){}
+  });
+
+  // stage
+  var Stage = function(){
+    if(typeof(this.init) == 'function'){
+      this.init.apply(this, arguments);
+    };
+  };
+
+  Stage.prototype = $.extend({}, DisplayObject.prototype, {
+    fps: 60,
+    millisecond: 1000,
+    canvas: null,
+    context: null,
+
+    init : function(stageId){
+      this.canvas  = $(stageId).get(0);
+      this.context = this.canvas.getContext('2d');
+
+      // 横、縦幅をウィンドウサイズと同じように設定する
+      this.width  = $(window).width();
+      this.height = $(window).height();
+      this.canvas.width  = this.width;
+      this.canvas.height = this.height;
+      var self = this;
+
+      // onResize
+      $(window).on('resize', function(){
+        self.width  = $(window).width();
+        self.height = $(window).height();
+        self.canvas.width  = self.width;
+        self.canvas.height = self.height;
+      });
+    }
+  });
+
+  // main
+  var stage  = new Stage('#stage');
+  var c      = stage.context;
+  var cubes  = [];
+  var speed  = 180;
+  var cNum   = 30;
+  var radian = 0;
+  var angle  = 0;
+  var speedY = Math.random() * (.5 - -.5) + -.5;
+  var speedX = Math.random() * (.5 - -.5) + -.5;
+
+  if(!c)return;
+
+  $(window).on('load', function(){
+    cubes = cubeInit(c);
+  });
+
+  (function(){
+    c.save();
+    c.clearRect(0, 0, stage.width, stage.height);
+    speedX += Math.random() * .1;
+    speedY += Math.random() * .1;
+
+    for(var i = 0; i < cubes.length; i++){
+      cubes[i].x += (Math.cos(radian) * angle + stage.width) / speed;
+      cubes[i].y -= (Math.sin(radian) * angle + stage.height) / speed;
+      cubes[i].x -= speedX;
+      cubes[i].y += speedY;
+
+      // 右
+      if(cubes[i].x > stage.width + cubes[i].width){
+        speedX = Math.random() * speedX;
+        cubeUpdate(cubes[i]);
+      }
+      // 左
+      if(cubes[i].x + cubes[i].width < 0){
+        speedX = Math.random() * speedX;
+        cubeUpdate(cubes[i]);
+      }
+      // 上
+      if(cubes[i].y + cubes[i].height < 0){
+        speedY = Math.random() * speedY;
+        cubeUpdate(cubes[i]);
+      }
+      // 下
+      if(cubes[i].y > stage.height + cubes[i].height){
+        speedY = Math.random() * speedY;
+        cubeUpdate(cubes[i]);
+      }
+
+      c.scale(cubes[i].scaleX, cubes[i].scaleY);
+      c.globalAlpha = cubes[i].alpha;
+      c.rotate(radian);
+      c.drawImage(cubes[i].image, cubes[i].x, cubes[i].y);
+    }
+
+    c.restore();
+    setTimeout(arguments.callee, stage.millisecond / stage.fps);
+  })();
+
+  // reset cubes
+  function cubeInit(c){
+    var localCubes = [];
+    var len        = cNum;
+
+    c.save();
+    c.clearRect(0, 0, stage.width, stage.height);
+    c.restore();
+
+    angle  = Math.random() * (180 - -180) + -180;
+    radian = deg2rad(angle);
+
+    for(var i = 0; i < len; i++){
+      localCubes[i]           = new Cube();
+      localCubes[i].image.src = 'images/cube.png';
+      localCubes[i].width     = localCubes[i].image.width;
+      localCubes[i].height    = localCubes[i].image.height;
+
+      localCubes[i].scaleX = Math.random() * (1 -.8) +.8;
+      localCubes[i].scaleY = localCubes[i].scaleX;
+      localCubes[i].alpha  = Math.random() * (.7 -.3) + .3;
+
+      // drawImage
+      localCubes[i].x = Math.random() * stage.width;
+      localCubes[i].y = Math.random() * stage.height;
+
+      localCubes[i].x += (Math.cos(radian) * angle + stage.width) / speed;
+      localCubes[i].y += (Math.sin(radian) * angle + stage.height) / speed;
+    }
+    return localCubes;
+  }
+
+   // reset
+  function cubeUpdate(cube){
+    radian = deg2rad(angle);
+    cube.x = Math.random() * stage.width;
+    cube.y = Math.random() * stage.height;
+    // cube.x += (Math.cos(radian) * angle + stage.width) / speed;
+    // cube.y += (Math.sin(radian) * angle + stage.height) / speed;
+  }
+
+  function deg2rad(degree){
+    return degree * (Math.PI / 180);
+  }
+
+  //c.translate(localCubes[i].x + localCubes[i].width *.5, localCubes[i].y +localCubes[i].height *.5);
+  //c.scale(localCubes[i].scaleX, localCubes[i].scaleY);
+  //c.translate(-localCubes[i].width *.5, -localCubes[i].height *.5);
+  //c.drawImage(localCubes[i].image, localCubes[i].x, localCubes[i].y);
+})(jQuery);
+</script>
+</body>
+</html>
