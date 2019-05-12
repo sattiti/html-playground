@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<title>html validator</title>
+<style type="text/css">
+body{
+  margin: 0;
+  padding: 0;
+  background-color: #002b36;
+}
+h1,h2,h3,h4,h5,h6,p,textarea,table,th,td,pre,code{
+  margin: 0;
+  padding: 0;
+  line-height: 1.5;
+  color: #f7f7f7;
+  font-size: 1em;
+}
+th,td,code,pre{
+  word-break: break-all;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+div#wrapper{
+  padding: 1em;
+}
+textarea#htmlarea{
+  background-color: #002b36;
+  border: 2px solid #d61144;
+  width: 100%;
+  overflow: auto;
+}
+textarea#htmlarea:focus{
+  background-color: #839496;
+}
+div#result{
+  border-top: 2px solid #d61144;
+  height: 100%;
+  margin-top: 1em;
+  padding: 1em;
+}
+div.tb0 table{
+  width: 100%;
+}
+div.tb0 table,
+div.tb0 table tr th,
+div.tb0 table tr td{
+  border-collapse: collapse;
+  border: none;
+  border-bottom: 1px solid #586e75;
+}
+code,
+pre{
+  display: block;
+  text-align: left;
+  vertical-align: top;
+  padding: .25em;
+  margin: 0;
+}
+code{
+  border: 1px dashed #268bd2;
+}
+div.tb0 table tr th,
+div.tb0 table tr td{
+  border-collapse: collapse;
+  padding: .2em .4em;
+  text-align: left;
+  vertical-align: top;
+  background-color: #073642;
+}
+div.tb0 table tr th{
+  width: 12%;
+}
+div.tb0 table tr td{
+  width: 88%;
+}
+h2{
+  margin: 0;
+  margin-top: 1em;
+  padding: .1em;
+  text-align: center;
+  border-radius: 6px;
+}
+.warning{
+  background-color: #d6d411;
+}
+.error{
+  background-color: #d61144;
+}
+.info{
+  background-color: #1185d6;
+}
+ul.ul0{
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  margin-top: 2em;
+}
+ul.ul0 li{
+  padding: .4em 1em;
+  display: inline;
+  font-weight: bold;
+  border-radius: 6px;
+  margin-right: 1em;
+}
+ul.ul0 li a{
+  color: #f7f7f7;
+}
+.hljs{display:block;overflow-x:auto;padding:0.5em;background:#002b36;color:#839496}.hljs-comment,.hljs-quote{color:#586e75}.hljs-keyword,.hljs-selector-tag,.hljs-addition{color:#859900}.hljs-number,.hljs-string,.hljs-meta .hljs-meta-string,.hljs-literal,.hljs-doctag,.hljs-regexp{color:#2aa198}.hljs-title,.hljs-section,.hljs-name,.hljs-selector-id,.hljs-selector-class{color:#268bd2}.hljs-attribute,.hljs-attr,.hljs-variable,.hljs-template-variable,.hljs-class .hljs-title,.hljs-type{color:#b58900}.hljs-symbol,.hljs-bullet,.hljs-subst,.hljs-meta,.hljs-meta .hljs-keyword,.hljs-selector-attr,.hljs-selector-pseudo,.hljs-link{color:#cb4b16}.hljs-built_in,.hljs-deletion{color:#dc322f}.hljs-formula{background:#073642}.hljs-emphasis{font-style:italic}.hljs-strong{font-weight:bold}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.6/build/styles/default.min.css">
+</head>
+<body>
+<div id="wrapper">
+<h1>html validator</h1>
+<form action="">
+  <textarea id="htmlarea" cols="30" rows="8" name="htmlarea"></textarea>
+  <button type="button" id="valid">チェックする</button>
+  <button type="button" id="clear">クリア</button>
+</form>
+</div>
+<div id="result"></div>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/htmlhint@latest/dist/htmlhint.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jshint@2.10.1/dist/jshint.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/csslint@1.0.5/dist/csslint.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@9.15.6/build/highlight.min.js"></script>
+<script>
+;(function($){
+  hljs.initHighlightingOnLoad();
+  String.prototype.escape = function(){
+    return this.replace(/&/mg, '&amp;')
+    .replace(/\b;amp;\b/, ';')
+    .replace(/'/mg, '&#x27;')
+    .replace(/`/mg, '&#x60;')
+    .replace(/"/mg, '&quot;')
+    .replace(/</mg, '&lt;')
+    .replace(/>/mg, '&gt;')
+  };
+  const rules = {
+    "tagname-lowercase": true,
+    "attr-lowercase": true,
+    "attr-value-double-quotes": true,
+    "attr-value-not-empty": true,
+    "attr-no-duplication": true,
+    "doctype-first": true,
+    "tag-pair": true,
+    "tag-self-close": false,
+    "spec-char-escape": true,
+    "id-unique": true,
+    "src-not-empty": true,
+    "title-require": true,
+    "alt-require": true,
+    "doctype-html5": true,
+    "id-class-value": "camel",
+    "style-disabled": false,
+    "inline-style-disabled": false,
+    "inline-script-disabled": false,
+    "space-tab-mixed-disabled": "space",
+    "id-class-ad-disabled": true,
+    "href-abs-or-rel": false,
+    "attr-unsafe-chars": true,
+    "head-script-disabled": true
+  };
+
+  let inArea   = $('textarea#htmlarea');
+  let runBtn   = $('button#valid');
+  let clearBtn = $('button#clear');
+  let outArea  = $('div#result');
+
+  clearBtn.on('click', function(e){
+    e.stopPropagation();
+    e.preventDefault();
+    inArea.val('');
+    outArea.children().remove();
+  });
+
+  runBtn.on('click', function(e){
+    e.stopPropagation();
+    e.preventDefault();
+
+    outArea.children().remove();
+
+    let src       = inArea.val();
+    let messages  = HTMLHint.default.verify(src, rules);
+    var errCount  = 0;
+    var infoCount = 0;
+    var warnCount = 0;
+
+    if(src.length <= 0) return;
+
+    $(messages).each(function(i, o){
+      var typeCls = ((t)=>{
+        cls = '';
+        switch(t){
+          case 'info':
+            cls = 'info';
+            infoCount += 1;
+            break;
+          case 'warn':
+            cls = 'warning';
+            warnCount += 1;
+            break;
+          default:
+            cls = 'error';
+            errCount += 1;
+        };
+        return cls;
+      })(o.type);
+
+      outArea.append('<div class="tb0 + '+cls+'Bk">' +
+        '<h2 class="'+cls+'">'+o.type.charAt(0).toUpperCase() +o.type.substring(1, o.type.length)+'</h2>' +
+        '<table border="1"><tbody>'+
+        '<tr><th>Line: Col</th><td>'+o.line+': '+o.col+'</td><tr>'+
+        '<tr><th>Message</th><td>'+o.message.toString().escape()+'</td><tr>'+
+        '<tr><th>Raw</th><td><pre><code>'+o.raw.toString().escape()+'</code></pre></td><tr>'+
+        '<tr><th>Source</th><td><pre><code>'+o.evidence.toString().escape()+'</code></pre></td><tr>'+
+        '</tbody></table></div>'
+      );
+    });
+
+    hljs.configure({
+      tabReplace: '  ',
+      usrBR: true
+    });
+    $('pre > code').each(function(i, block){
+       hljs.highlightBlock(block);
+    });
+
+    outArea.prepend('<ul class="ul0">' +
+      '<li class="info"><a href="javascript:;" id="infoLink">info:    ' + infoCount + '</a></li>' +
+      '<li class="warning"><a href="javascript:;" id="warningLink">warning: ' + warnCount + '</a></li>' +
+      '<li class="error"><a href="javascript:;" id="errorLink">error:   ' + errCount + '</a></li>' +
+      '</ul>');
+
+    let infoBtn    = $('ul.ul0 li a#infoLink');
+    let warningBtn = $('ul.ul0 li a#warningLink');
+    let errorBtn   = $('ul.ul0 li a#errorLink');
+
+    $('ul.ul0 li a').each(function(i, o){
+      $(o).on('click', function(e){
+        e.stopPropagation();
+        e.preventDefault();
+
+        outArea.children('div.tb0').hide();
+        let c    = $(e.currentTarget);
+        let name = c.attr('id').replace('Link', '');
+        let bk   = $('div.' + name + 'Bk');
+        bk.show();
+
+      });
+    });
+  });
+})(jQuery);
+</script>
+</body>
+</html>
+
