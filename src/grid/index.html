@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<title></title>
+<style type="text/css">
+#container{
+}
+header{
+  background-color: lime;
+}
+nav{
+  background-color: orange;
+}
+main{
+  background-color: lightblue;
+  display: grid;
+  grid-template-columns: 1fr 2fr 3fr;
+  grid-row-gap: 1rem;
+  grid-column-gap: 1rem;
+  align-content: space-around;
+}
+section{
+  border: 2px dotted magenta;
+  background-color: cyan;
+}
+section:nth-of-type(1){
+  grid-column-start: 1;
+  grid-column-end: 6;
+}
+
+footer{
+  background-color: lightgreen;
+}
+</style>
+</head>
+<body>
+<div id="container">
+  <header>
+    <p>header</p>
+  </header>
+  <nav>
+    <ul>
+      <li><a href="">1</a></li>
+      <li><a href="">2</a></li>
+      <li><a href="">3</a></li>
+      <li><a href="">4</a></li>
+    </ul>
+  </nav>
+  <div id="contents">
+    <main>
+      <section>
+        <h2>s1</h2>
+      </section>
+      <section>
+        <h2>s2</h2>
+      </section>
+      <section>
+        <h2>s3</h2>
+      </section>
+      <section>
+        <h2>s4</h2>
+      </section>
+      <section>
+        <h2>s5</h2>
+      </section>
+      <section>
+        <h2>s6</h2>
+      </section>
+      <section>
+        <h2>s7</h2>
+      </section>
+    </main>
+  </div>
+  <footer>
+    <p>footer</p>
+  </footer>
+</div>
+</body>
+</html>
