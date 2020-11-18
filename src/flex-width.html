@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<title>qqq</title>
+<style type="text/css">
+body{
+  margin: 0;
+  padding: 0;
+}
+.row{
+  margin-top: 2rem;
+  display: flex;
+  width: 100%;
+  background-color: gray;
+  justify-content: space-between;
+}
+.col{
+  background-color: green;
+  flex-basis: auto;
+  margin-right: 1rem;
+  width: 100%;
+}
+.col:last-of-type{
+  margin-right: 0;
+}
+.col:nth-of-type(1){
+  max-width: 60%;
+}
+.col:nth-of-type(2){
+  max-width: 20%;
+  background-color: yellow;
+}
+.col:nth-of-type(3){
+  max-width: 20%;
+  background-color: pink;
+}
+</style>
+</head>
+<body>
+  <p class="full">11</p>
+  <div class="row">
+    <div class="col">
+      <p>1</p>
+    </div>
+    <div class="col">
+      <p>2</p>
+    </div>
+    <div class="col">
+      <p>3</p>
+    </div>
+  </div>
+<script>
+(function(w,d){
+  w.addEventListener('load', a);
+  w.addEventListener('resize', a);
+  function a(e){
+    const row = d.querySelector('.row');
+    const full = d.querySelector('.full');
+    full.textContent = row.clientWidth;
+
+    const cols = d.querySelectorAll('.col');
+    cols.forEach((o, i)=>{
+      const p = o.getElementsByTagName('p')
+      o.textContent = o.clientWidth
+    })
+  }
+})(window, document);
+</script>
+</body>
+</html>
